@@ -5,7 +5,9 @@ const MainLayout = ({ children }: LayoutProps<"/">) => {
   return (
     <>
       <Header />
-      {children}
+      <main className="mx-auto max-w-300">
+        {children}
+      </main>
       <Footer />
     </>
   );
