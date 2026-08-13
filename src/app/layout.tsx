@@ -23,7 +23,7 @@ const RootLayout = ({ children }: LayoutProps<"/">) => {
       <body id="body">
         <div
           id="bodyWrap"
-          className={`${jetbrainsMono.variable} ${pretendard.variable} h-full antialiased`}
+          className={`${jetbrainsMono.variable} ${pretendard.variable} h-full antialiased font-sans`}
         >
           {children}
         </div>

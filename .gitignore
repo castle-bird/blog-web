@@ -45,3 +45,8 @@ next-env.d.ts
 AGENTS.md
 CLAUDE.md
 docs/
+
+# IDE
+.idea
+.vscode
+.zed
