@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {useAccessToken} from "@/lib/auth";
 import {deletePost} from "@/lib/posts";
+import {ApiError} from "@/lib/api";
 
 type PostActionsProps = {
   postId: number;
@@ -26,6 +27,7 @@ const PostActions = ({postId}: PostActionsProps) => {
   const router = useRouter();
   const accessToken = useAccessToken();
   const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!accessToken) return null;
 
@@ -33,8 +35,10 @@ const PostActions = ({postId}: PostActionsProps) => {
     setDeleting(true);
     try {
       await deletePost(postId);
+      router.refresh();
       router.push("/");
-    } catch {
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "삭제에 실패했습니다.");
       setDeleting(false);
     }
   };
@@ -54,6 +58,7 @@ const PostActions = ({postId}: PostActionsProps) => {
               <AlertDialogTitle>게시글을 삭제할까요?</AlertDialogTitle>
               <AlertDialogDescription>삭제하면 되돌릴 수 없습니다.</AlertDialogDescription>
             </AlertDialogHeader>
+            {error && <p className="text-sm text-destructive">{error}</p>}
             <AlertDialogFooter>
               <AlertDialogCancel>취소</AlertDialogCancel>
               <AlertDialogAction variant="destructive" onClick={handleDelete} disabled={deleting}>

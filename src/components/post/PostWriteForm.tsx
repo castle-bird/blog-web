@@ -70,6 +70,7 @@ const PostWriteForm = ({categories, initialPost}: PostWriteFormProps) => {
       const post = initialPost
           ? await updatePost(initialPost.id, payload)
           : await createPost(payload);
+      router.refresh();
       router.push(`/post/${post.id}`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "저장에 실패했습니다.");
