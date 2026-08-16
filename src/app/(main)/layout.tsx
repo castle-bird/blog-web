@@ -1,15 +1,15 @@
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
-const MainLayout = ({ children }: LayoutProps<"/">) => {
+const MainLayout = ({children}: LayoutProps<"/">) => {
   return (
-    <>
-      <Header />
-      <main className="mx-auto max-w-300">
-        {children}
-      </main>
-      <Footer />
-    </>
+      <>
+        <Header/>
+        <main className="mx-auto max-w-300">
+          {children}
+        </main>
+        <Footer/>
+      </>
   );
 };
 
