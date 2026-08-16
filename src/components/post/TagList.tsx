@@ -20,7 +20,7 @@ const TagList = ({tags, selectedTag = null, onSelectTag}: TagListProps) => {
                           : "bg-light-gray text-muted-foreground hover:bg-primary-light hover:text-primary"
                   }`}
               >
-                {tag}
+                # {tag}
               </button>
             </li>
         ))}
