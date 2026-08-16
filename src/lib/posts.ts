@@ -1,3 +1,4 @@
+import {cache} from "react";
 import {api, throwApiError, type SuccessResponse} from "@/lib/api";
 
 export type Post = {
@@ -34,14 +35,15 @@ export const getPosts = async (cursorId?: number): Promise<PostListResponse> => 
   return data.data;
 };
 
-export const getPost = async (postId: number): Promise<Post> => {
+// 상세 페이지에서 generateMetadata와 페이지 컴포넌트가 같은 postId로 중복 호출하는 걸 한 요청으로 합침.
+export const getPost = cache(async (postId: number): Promise<Post> => {
   try {
     const {data} = await api.get<SuccessResponse<Post>>(`/api/posts/${postId}`);
     return data.data;
   } catch (err) {
     return throwApiError(err);
   }
-};
+});
 
 export const createPost = async (payload: PostWriteRequest): Promise<Post> => {
   try {

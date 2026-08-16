@@ -1,4 +1,5 @@
 import {notFound} from "next/navigation";
+import type {Metadata} from "next";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -7,13 +8,29 @@ import PostActions from "@/components/post/PostActions";
 import {ApiError} from "@/lib/api";
 import {getPost} from "@/lib/posts";
 
-const PostDetail = async ({params}: PageProps<"/post/[id]">) => {
-  const {id} = await params;
+const resolvePost = async (id: string) => {
+  const postId = Number(id);
+  if (Number.isNaN(postId)) notFound();
 
-  const post = await getPost(Number(id)).catch((err) => {
+  return getPost(postId).catch((err) => {
     if (err instanceof ApiError && err.code === "POST_NOT_FOUND") notFound();
     throw err;
   });
+};
+
+export const generateMetadata = async ({params}: PageProps<"/post/[id]">): Promise<Metadata> => {
+  const {id} = await params;
+  const post = await resolvePost(id);
+
+  return {
+    title: post.title,
+    description: post.content.slice(0, 100),
+  };
+};
+
+const PostDetail = async ({params}: PageProps<"/post/[id]">) => {
+  const {id} = await params;
+  const post = await resolvePost(id);
 
   return (
       <article className="px-4 py-8">
