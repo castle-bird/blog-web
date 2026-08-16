@@ -79,7 +79,7 @@ const Home = () => {
         <PostList posts={MOCK_POSTS}/>
       </div>
 
-      <aside className="w-80 shrink-0">
+      <aside className="w-80 shrink-0 sticky top-22.25 h-fit">
         <PageTitle textContent="태그" className="text-sm mb-4"/>
         <TagList tags={MOCK_TAGS}/>
       </aside>

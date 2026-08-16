@@ -16,7 +16,7 @@ const Header = () => {
   };
 
   return (
-      <header className="border-b">
+      <header className="border-b sticky top-0 z-50 bg-background">
         <div className="mx-auto flex h-14 max-w-300 items-center justify-between px-4">
           <h1>
             <Logo/>
