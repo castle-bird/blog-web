@@ -1,3 +1,6 @@
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
 import PageTitle from "@/components/layout/PageTitle";
 
 const MOCK_POST = {
@@ -25,7 +28,7 @@ const PostDetail = () => {
           ))}
         </div>
 
-        <PageTitle textContent={MOCK_POST.title} level="h1" className="mt-2"/>
+        <PageTitle textContent={MOCK_POST.title} level="h2" className="mt-2"/>
 
         <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
           <span>{MOCK_POST.authorNickname}</span>
@@ -33,8 +36,10 @@ const PostDetail = () => {
           <span>{new Date(MOCK_POST.createdAt).toLocaleDateString("ko-KR")}</span>
         </div>
 
-        <div className="mt-8 border-t pt-8 whitespace-pre-wrap text-base leading-relaxed">
-          {MOCK_POST.content}
+        <div className="prose dark:prose-invert mt-8 max-w-none border-t pt-8 break-words">
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeHighlight]}>
+            {MOCK_POST.content}
+          </ReactMarkdown>
         </div>
       </article>
   )
