@@ -24,7 +24,7 @@ const RootLayout = ({ children }: LayoutProps<"/">) => {
       <body id="body">
         <div
           id="bodyWrap"
-          className={`${jetbrainsMono.variable} ${pretendard.variable} antialiased font-sans min-h-screen`}
+          className={`${jetbrainsMono.variable} ${pretendard.variable} antialiased font-sans min-h-screen flex flex-col`}
         >
           <AuthRehydrate/>
           {children}

@@ -10,6 +10,9 @@
   */
   --font-sans: var(--font-pretendard);
   --font-mono: var(--font-jetbrains-mono);
+
+  --color-light-gray: #ededed;
+  --color-primary-light: hsl(228, 100%, 95%);
   /*
     Custom variables - end
   */
