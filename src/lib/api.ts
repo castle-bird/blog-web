@@ -20,3 +20,10 @@ export class ApiError extends Error {
     super(message);
   }
 }
+
+export const throwApiError = (err: unknown): never => {
+  if (axios.isAxiosError<ErrorResponse>(err) && err.response) {
+    throw new ApiError(err.response.data.code, err.response.data.message);
+  }
+  throw err;
+};

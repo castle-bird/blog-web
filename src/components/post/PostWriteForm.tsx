@@ -19,28 +19,63 @@ import {
 } from "@/components/ui/select";
 import {useAccessToken, useAuthReady} from "@/lib/auth";
 import type {Category} from "@/lib/categories";
+import {createPost, updatePost, type Post} from "@/lib/posts";
+import {ApiError} from "@/lib/api";
 import SubTitle from "@/components/layout/SubTitle";
 
 type PostWriteFormProps = {
   categories: Category[];
+  initialPost?: Post;
 };
 
-const PostWriteForm = ({categories}: PostWriteFormProps) => {
+const PostWriteForm = ({categories, initialPost}: PostWriteFormProps) => {
   const router = useRouter();
 
   const accessToken = useAccessToken();
   const authReady = useAuthReady();
 
-  const [title, setTitle] = useState("");
-  const [categoryId, setCategoryId] = useState<number | "">("");
-  const [tagsInput, setTagsInput] = useState("");
-  const [content, setContent] = useState("");
+  const [title, setTitle] = useState(initialPost?.title ?? "");
+  const [categoryId, setCategoryId] = useState<number | "">(initialPost?.categoryId ?? "");
+  const [tagsInput, setTagsInput] = useState(initialPost?.tags.join(", ") ?? "");
+  const [content, setContent] = useState(initialPost?.content ?? "");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (authReady && !accessToken) router.replace("/login");
   }, [authReady, accessToken, router]);
 
   if (!authReady || !accessToken) return null;
+
+  const handleSubmit = async () => {
+    if (categoryId === "") {
+      setError("카테고리를 선택해주세요.");
+      return;
+    }
+
+    setError(null);
+    setSubmitting(true);
+
+    const payload = {
+      title,
+      content,
+      categoryId,
+      tags: tagsInput
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+    };
+
+    try {
+      const post = initialPost
+          ? await updatePost(initialPost.id, payload)
+          : await createPost(payload);
+      router.push(`/post/${post.id}`);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "저장에 실패했습니다.");
+      setSubmitting(false);
+    }
+  };
 
   return (
       <div className="px-4 py-8">
@@ -114,8 +149,11 @@ const PostWriteForm = ({categories}: PostWriteFormProps) => {
             </div>
           </div>
 
-          <div className="flex justify-end">
-            <Button type="button">등록</Button>
+          <div className="flex items-center justify-end gap-3">
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button type="button" onClick={handleSubmit} disabled={submitting}>
+              {initialPost ? "수정" : "등록"}
+            </Button>
           </div>
         </div>
       </div>

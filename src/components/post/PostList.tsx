@@ -1,13 +1,5 @@
 import Link from "next/link";
-
-type Post = {
-  id: number;
-  title: string;
-  authorNickname: string;
-  categoryName: string;
-  tags: string[];
-  createdAt: string;
-};
+import type {Post} from "@/lib/posts";
 
 type PostListProps = {
   posts: Post[];

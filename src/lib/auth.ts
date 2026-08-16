@@ -1,6 +1,6 @@
 import {useSyncExternalStore} from "react";
-import axios, {type AxiosError, type InternalAxiosRequestConfig} from "axios";
-import {api, ApiError, type SuccessResponse, type ErrorResponse} from "@/lib/api";
+import type {AxiosError, InternalAxiosRequestConfig} from "axios";
+import {api, throwApiError, type SuccessResponse} from "@/lib/api";
 
 type LoginResponse = {
   accessToken: string;
@@ -33,13 +33,6 @@ const subscribe = (listener: () => void) => {
 // 로그인 상태에 반응해서 리렌더해야 하는 컴포넌트에서 사용
 export const useAccessToken = () => useSyncExternalStore(subscribe, getAccessToken, () => null);
 export const useAuthReady = () => useSyncExternalStore(subscribe, getAuthReady, () => false);
-
-const throwApiError = (err: unknown): never => {
-  if (axios.isAxiosError<ErrorResponse>(err) && err.response) {
-    throw new ApiError(err.response.data.code, err.response.data.message);
-  }
-  throw err;
-};
 
 export const login = async (email: string, password: string) => {
   try {
