@@ -1,6 +1,9 @@
 import PageTitle from "@/components/layout/PageTitle";
 import { getCategories } from "@/lib/categories";
 
+// axios는 Next fetch 캐시 계측을 안 타서 빌드 타임에 정적으로 굳어버림 — 매 요청 새로 렌더하도록 강제.
+export const dynamic = "force-dynamic";
+
 const CategoryPage = async () => {
   const categories = await getCategories();
 

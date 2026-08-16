@@ -1,28 +1,13 @@
-import PostList from "@/components/post/PostList";
-import TagList from "@/components/post/TagList";
-import PageTitle from "@/components/layout/PageTitle";
+import PostFeed from "@/components/post/PostFeed";
 import {getPosts} from "@/lib/posts";
 
+// axios는 Next fetch 캐시 계측을 안 타서 빌드 타임에 정적으로 굳어버림 — 매 요청 새로 렌더하도록 강제.
+export const dynamic = "force-dynamic";
+
 const Home = async () => {
-  const {posts} = await getPosts();
-  const tags = [...new Set(posts.flatMap((post) => post.tags))];
+  const {posts, nextCursorId, hasNext} = await getPosts();
 
-  return (
-      <div className="flex gap-8 px-4 py-8">
-        <div className="min-w-0 flex-1">
-          {posts.length === 0 ? (
-              <p className="text-sm text-muted-foreground">등록된 게시글이 없습니다.</p>
-          ) : (
-              <PostList posts={posts}/>
-          )}
-        </div>
-
-        <aside className="sticky top-22.25 h-fit w-80 shrink-0">
-          <PageTitle textContent="태그" className="mb-4 text-sm"/>
-          <TagList tags={tags}/>
-        </aside>
-      </div>
-  );
+  return <PostFeed initialPosts={posts} initialNextCursorId={nextCursorId} initialHasNext={hasNext}/>;
 };
 
 export default Home;
