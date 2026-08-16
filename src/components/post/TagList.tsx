@@ -14,7 +14,7 @@ const TagList = ({tags, selectedTag = null, onSelectTag}: TagListProps) => {
               <button
                   type="button"
                   onClick={() => onSelectTag?.(selectedTag === tag ? null : tag)}
-                  className={`rounded-full px-3 py-1 text-sm transition-colors cursor-pointer  ${
+                  className={`rounded-full px-3 py-1 text-sm transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-foreground ${
                       selectedTag === tag
                           ? "bg-primary text-primary-foreground"
                           : "bg-light-gray text-muted-foreground hover:bg-primary-light hover:text-primary"
