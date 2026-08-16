@@ -1,5 +1,6 @@
 import {notFound} from "next/navigation";
 import type {Metadata} from "next";
+import {Eye} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -51,6 +52,11 @@ const PostDetail = async ({params}: PageProps<"/post/[id]">) => {
           <span>{post.authorNickname}</span>
           <span aria-hidden="true">·</span>
           <span>{new Date(post.createdAt).toLocaleDateString("ko-KR")}</span>
+          <span aria-hidden="true">·</span>
+          <span className="flex items-center gap-1">
+            <Eye className="size-3.5"/>
+            {post.viewCount}
+          </span>
         </div>
 
         <div className="prose dark:prose-invert mt-8 max-w-none border-t pt-8 break-words">
