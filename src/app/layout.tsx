@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import AuthRehydrate from "@/components/auth/AuthRehydrate";
 
 const pretendard = localFont({
   src: "../fonts/pretendard/Pretendard-Regular.subset.woff2",
@@ -23,8 +24,9 @@ const RootLayout = ({ children }: LayoutProps<"/">) => {
       <body id="body">
         <div
           id="bodyWrap"
-          className={`${jetbrainsMono.variable} ${pretendard.variable} h-full antialiased font-sans`}
+          className={`${jetbrainsMono.variable} ${pretendard.variable} antialiased font-sans min-h-screen`}
         >
+          <AuthRehydrate/>
           {children}
         </div>
       </body>

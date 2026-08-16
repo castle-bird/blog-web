@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export function Footer() {
+const Footer = () => {
   return (
       <footer className="border-t">
         <div
@@ -28,3 +28,5 @@ export function Footer() {
       </footer>
   );
 }
+
+export default Footer;
