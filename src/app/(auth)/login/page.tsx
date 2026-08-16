@@ -1,6 +1,6 @@
 "use client";
 
-import {useState, type SubmitEvent} from "react";
+import {useEffect, useState, type SubmitEvent} from "react";
 import {useRouter} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import SubTitle from "@/components/layout/SubTitle";
@@ -8,18 +8,23 @@ import {EyeOffIcon} from "lucide-react";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Field, FieldLabel} from "@/components/ui/field";
 import Logo from "@/components/layout/logo";
-import {login} from "@/lib/auth";
+import {login, useAccessToken} from "@/lib/auth";
 import {ApiError} from "@/lib/api";
 
 
 const LoginPage = () => {
   const router = useRouter();
+  const accessToken = useAccessToken();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (accessToken) router.replace("/");
+  }, [accessToken, router]);
 
   const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
