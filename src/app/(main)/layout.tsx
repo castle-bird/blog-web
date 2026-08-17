@@ -5,7 +5,7 @@ const MainLayout = ({children}: LayoutProps<"/">) => {
   return (
       <>
         <Header/>
-        <main className="mx-auto max-w-300">
+        <main className="mx-auto w-full max-w-300 flex-1">
           {children}
         </main>
         <Footer/>

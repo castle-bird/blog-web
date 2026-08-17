@@ -1,3 +1,10 @@
+import axios from "axios";
+
+export const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
+});
+
 export type SuccessResponse<T> = {
   data: T;
   message: "Success";
@@ -13,3 +20,10 @@ export class ApiError extends Error {
     super(message);
   }
 }
+
+export const throwApiError = (err: unknown): never => {
+  if (axios.isAxiosError<ErrorResponse>(err) && err.response) {
+    throw new ApiError(err.response.data.code, err.response.data.message);
+  }
+  throw err;
+};

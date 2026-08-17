@@ -1,17 +1,27 @@
-import { useSyncExternalStore } from "react";
-import { ApiError, type SuccessResponse, type ErrorResponse } from "@/lib/api";
+import {useSyncExternalStore} from "react";
+import type {AxiosError, InternalAxiosRequestConfig} from "axios";
+import {api, throwApiError, type SuccessResponse} from "@/lib/api";
 
 type LoginResponse = {
   accessToken: string;
 };
 
 let accessToken: string | null = null;
+let authReady = false;
 const listeners = new Set<() => void>();
 
 export const getAccessToken = () => accessToken;
 
 export const setAccessToken = (token: string | null) => {
   accessToken = token;
+  listeners.forEach((listener) => listener());
+};
+
+// 최초 rehydrate(refresh) 시도가 끝났는지 여부. 끝나기 전엔 accessToken이 null이어도 미로그인 확정이 아님.
+export const getAuthReady = () => authReady;
+
+export const setAuthReady = () => {
+  authReady = true;
   listeners.forEach((listener) => listener());
 };
 
@@ -22,30 +32,20 @@ const subscribe = (listener: () => void) => {
 
 // 로그인 상태에 반응해서 리렌더해야 하는 컴포넌트에서 사용
 export const useAccessToken = () => useSyncExternalStore(subscribe, getAccessToken, () => null);
+export const useAuthReady = () => useSyncExternalStore(subscribe, getAuthReady, () => false);
 
 export const login = async (email: string, password: string) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (!res.ok) {
-    const err: ErrorResponse = await res.json();
-    throw new ApiError(err.code, err.message);
+  try {
+    const {data} = await api.post<SuccessResponse<LoginResponse>>("/api/auth/login", {email, password});
+    setAccessToken(data.data.accessToken);
+  } catch (err) {
+    throwApiError(err);
   }
-
-  const body: SuccessResponse<LoginResponse> = await res.json();
-  setAccessToken(body.data.accessToken);
 };
 
 export const logout = async () => {
   try {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
-      method: "POST",
-      credentials: "include",
-    });
+    await api.post("/api/auth/logout");
   } finally {
     setAccessToken(null);
   }
@@ -58,20 +58,14 @@ export const refresh = async (): Promise<string> => {
   if (refreshPromise) return refreshPromise;
 
   refreshPromise = (async () => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`, {
-      method: "POST",
-      credentials: "include",
-    });
-
-    if (!res.ok) {
+    try {
+      const {data} = await api.post<SuccessResponse<LoginResponse>>("/api/auth/refresh");
+      setAccessToken(data.data.accessToken);
+      return data.data.accessToken;
+    } catch (err) {
       setAccessToken(null);
-      const err: ErrorResponse = await res.json();
-      throw new ApiError(err.code, err.message);
+      return throwApiError(err);
     }
-
-    const body: SuccessResponse<LoginResponse> = await res.json();
-    setAccessToken(body.data.accessToken);
-    return body.data.accessToken;
   })();
 
   try {
@@ -80,3 +74,29 @@ export const refresh = async (): Promise<string> => {
     refreshPromise = null;
   }
 };
+
+// 요청마다 최신 AT를 Authorization 헤더에 첨부
+api.interceptors.request.use((config) => {
+  const token = getAccessToken();
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+// 보호 API가 401이면 refresh 후 원 요청을 한 번만 재시도
+api.interceptors.response.use(
+    (res) => res,
+    async (err: AxiosError) => {
+      const config = err.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
+      const isAuthEndpoint = config?.url?.startsWith("/api/auth/");
+
+      if (err.response?.status !== 401 || !config || config._retry || isAuthEndpoint) {
+        throw err;
+      }
+
+      config._retry = true;
+      await refresh().catch(() => {
+        throw err;
+      });
+      return api(config);
+    },
+);
