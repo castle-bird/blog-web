@@ -9,6 +9,8 @@ import PostActions from "@/components/post/PostActions";
 import {ApiError} from "@/lib/api";
 import {getPost} from "@/lib/posts";
 
+export const dynamic = "force-dynamic";
+
 const resolvePost = async (id: string) => {
   const postId = Number(id);
   if (Number.isNaN(postId)) notFound();
