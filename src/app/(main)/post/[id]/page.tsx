@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import PageTitle from "@/components/layout/PageTitle";
 import PostActions from "@/components/post/PostActions";
+import ViewCounter from "@/components/post/ViewCounter";
 import {ApiError} from "@/lib/api";
 import {getPost} from "@/lib/posts";
 
@@ -37,6 +38,7 @@ const PostDetail = async ({params}: PageProps<"/post/[id]">) => {
 
   return (
       <article className="px-4 py-8">
+        <ViewCounter postId={post.id}/>
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className="rounded-full bg-light-gray px-2 py-0.5 font-medium text-foreground">
             {post.categoryName}
