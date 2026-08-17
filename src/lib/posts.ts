@@ -53,6 +53,14 @@ export const getPost = cache(async (postId: number): Promise<Post> => {
   }
 });
 
+export const increasePostView = async (postId: number): Promise<void> => {
+  try {
+    await api.post(`/api/posts/${postId}/view`);
+  } catch (err) {
+    throwApiError(err);
+  }
+};
+
 export const createPost = async (payload: PostWriteRequest): Promise<Post> => {
   try {
     const {data} = await api.post<SuccessResponse<Post>>("/api/posts", payload);

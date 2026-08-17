@@ -11,6 +11,7 @@ const PostList = ({posts}: PostListProps) => {
         {posts.map((post) => (
             <li key={post.id} >
               <Link href={`/post/${post.id}`}
+                    prefetch={false}
                     className="block py-6 px-4 hover:bg-light-gray transition-colors duration-600 rounded-3xl my-2">
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <span className="rounded-full bg-light-gray px-2 py-0.5 font-medium text-foreground">
