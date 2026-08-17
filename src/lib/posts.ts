@@ -28,9 +28,12 @@ type PostListResponse = {
   hasNext: boolean;
 };
 
-export const getPosts = async (cursorId?: number): Promise<PostListResponse> => {
+export const getPosts = async (cursorId?: number, tag?: string): Promise<PostListResponse> => {
   const {data} = await api.get<SuccessResponse<PostListResponse>>("/api/posts", {
-    params: cursorId ? {cursorId} : undefined,
+    params: {
+      ...(cursorId ? {cursorId} : {}),
+      ...(tag ? {tag} : {}),
+    },
   });
   return data.data;
 };

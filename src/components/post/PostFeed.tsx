@@ -18,6 +18,10 @@ const PostFeed = ({initialPosts, initialNextCursorId, initialHasNext}: PostFeedP
   const [cursorId, setCursorId] = useState(initialNextCursorId);
   const [hasNext, setHasNext] = useState(initialHasNext);
   const [loading, setLoading] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [tagsPool, setTagsPool] = useState(
+      () => new Set(initialPosts.flatMap((post) => post.tags))
+  );
   const loadingRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -31,11 +35,14 @@ const PostFeed = ({initialPosts, initialNextCursorId, initialHasNext}: PostFeedP
       loadingRef.current = true;
       setLoading(true);
 
-      getPosts(cursorId)
+      getPosts(cursorId, selectedTag ?? undefined)
           .then((res) => {
             setPosts((prev) => [...prev, ...res.posts]);
             setCursorId(res.nextCursorId);
             setHasNext(res.hasNext);
+            if (!selectedTag) {
+              setTagsPool((prev) => new Set([...prev, ...res.posts.flatMap((post) => post.tags)]));
+            }
           })
           .catch(() => {
             // ponytail: 스크롤 중 실패하면 재시도 없이 그냥 멈춤. 재시도 큐 필요해지면 추가.
@@ -49,15 +56,35 @@ const PostFeed = ({initialPosts, initialNextCursorId, initialHasNext}: PostFeedP
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasNext, cursorId]);
+  }, [hasNext, cursorId, selectedTag]);
 
-  const tags = [...new Set(posts.flatMap((post) => post.tags))];
+  const handleSelectTag = (tag: string | null) => {
+    setSelectedTag(tag);
+    setLoading(true);
+    loadingRef.current = true;
+
+    getPosts(undefined, tag ?? undefined)
+        .then((res) => {
+          setPosts(res.posts);
+          setCursorId(res.nextCursorId);
+          setHasNext(res.hasNext);
+        })
+        .catch(() => setHasNext(false))
+        .finally(() => {
+          loadingRef.current = false;
+          setLoading(false);
+        });
+  };
 
   return (
       <div className="flex gap-8 px-4 py-8">
         <div className="min-w-0 flex-1">
-          {posts.length === 0 ? (
-              <p className="text-sm text-muted-foreground">등록된 게시글이 없습니다.</p>
+          {loading && posts.length === 0 ? (
+              <Loading message="게시글을 불러오는 중..."/>
+          ) : posts.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                {selectedTag ? `#${selectedTag} 태그의 게시글이 없습니다.` : "등록된 게시글이 없습니다."}
+              </p>
           ) : (
               <>
                 <PostList posts={posts}/>
@@ -72,7 +99,7 @@ const PostFeed = ({initialPosts, initialNextCursorId, initialHasNext}: PostFeedP
 
         <aside className="sticky top-22.25 h-fit w-80 shrink-0">
           <PageTitle textContent="태그" className="mb-4 text-sm"/>
-          <TagList tags={tags}/>
+          <TagList tags={[...tagsPool]} selectedTag={selectedTag} onSelectTag={handleSelectTag}/>
         </aside>
       </div>
   );

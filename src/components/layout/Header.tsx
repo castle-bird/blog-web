@@ -32,6 +32,14 @@ const Header = () => {
                   글쓰기
                 </Link>
             )}
+            {accessToken && (
+                <Link
+                    href="/category"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                >
+                  카테고리
+                </Link>
+            )}
             {accessToken && <Button onClick={handleLogout}>로그아웃</Button>}
           </div>
         </div>
