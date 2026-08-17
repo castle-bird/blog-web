@@ -2,7 +2,7 @@
 
 import {useRouter} from "next/navigation";
 import Link from "next/link";
-import Logo from "@/components/layout/logo";
+import Logo from "@/components/layout/Logo";
 import {Button} from "@/components/ui/button";
 import {logout, useAccessToken} from "@/lib/auth";
 

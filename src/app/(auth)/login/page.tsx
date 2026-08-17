@@ -7,7 +7,7 @@ import SubTitle from "@/components/layout/SubTitle";
 import {EyeOffIcon} from "lucide-react";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Field, FieldLabel} from "@/components/ui/field";
-import Logo from "@/components/layout/logo";
+import Logo from "@/components/layout/Logo";
 import {login, useAccessToken} from "@/lib/auth";
 import {ApiError} from "@/lib/api";
 
